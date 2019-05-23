@@ -2,7 +2,7 @@
   "name": "node-mockserver",
   "version": "1.1.0",
   "description": "",
-  "main": "lib/server.js",
+  "main": "lib/index.js",
   "scripts": {
     "test": "jest",
     "test:coverage": "jest --coverage --collectCoverageFrom='[\"**/src/**/*.js\", \"!**/examples/**\",\"!**/components/**\",\"!**/constants/**\"]'",
@@ -47,6 +47,9 @@
     "watchPlugins": [
       "jest-watch-typeahead/filename",
       "jest-watch-typeahead/testname"
+    ],
+    "watchPathIgnorePatterns": [
+      ".recording"
     ]
   }
 }
