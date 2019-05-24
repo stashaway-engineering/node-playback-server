@@ -1,36 +1,40 @@
+import fse from 'fs-extra';
 import axios from 'axios';
 import createTargetServer from './createTargetServer';
-import createRecordingServer from '../lib/createRecordingServer';
-import createPlaybackServer from '../lib/createPlaybackServer';
+import { createRecordingServer, createPlaybackServer } from '../lib';
 
 describe('playbackserver', () => {
-  const targetServerPort = 9123;
-  const targetServerUrl = `http://localhost:${targetServerPort}`;
+  const TARGET_SERVER_PORT = 9123;
+  const TARGET_SERVER_URL = `http://localhost:${TARGET_SERVER_PORT}`;
 
-  const recordingServerPort = 9124;
-  const recordingServerUrl = `http://localhost:${recordingServerPort}`;
+  const RECORDING_SERVER_PORT = 9124;
+  const RECORDING_SERVER_URL = `http://localhost:${RECORDING_SERVER_PORT}`;
 
-  const playbackServerPort = 9125;
-  const playbackServerUrl = `http://localhost:${playbackServerPort}`;
+  const PLAYBACK_SERVER_PORT = 9125;
+  const PLAYBACK_SERVER_URL = `http://localhost:${PLAYBACK_SERVER_PORT}`;
+
+  const RECORDING_DIR = './tests/recording/';
 
   let targetServer;
   let recordingServer;
   let playbackServer;
 
   beforeEach(async () => {
+    await fse.remove(RECORDING_DIR);
+
     targetServer = await createTargetServer({
-      port: targetServerPort,
+      port: TARGET_SERVER_PORT,
     });
 
     recordingServer = await createRecordingServer({
-      target: targetServerUrl,
-      port: recordingServerPort,
-      directory: './tests/recording/',
+      target: TARGET_SERVER_URL,
+      port: RECORDING_SERVER_PORT,
+      directory: RECORDING_DIR,
     });
 
     playbackServer = await createPlaybackServer({
-      port: playbackServerPort,
-      directory: './tests/recording/',
+      port: PLAYBACK_SERVER_PORT,
+      directory: RECORDING_DIR,
     });
   });
 
@@ -42,15 +46,15 @@ describe('playbackserver', () => {
 
   describe('targetServer', () => {
     it('returns static data for /static', async () => {
-      const response = await axios.get(`${targetServerUrl}/static`);
+      const response = await axios.get(`${TARGET_SERVER_URL}/static`);
       expect(response.data).toEqual({ data: 'get-static' });
     });
 
     it('returns dynamic data for /counter', async () => {
-      const response1 = await axios.get(`${targetServerUrl}/counter`);
-      const response2 = await axios.get(`${targetServerUrl}/counter`);
-      const response3 = await axios.get(`${targetServerUrl}/counter`);
-      const response4 = await axios.get(`${targetServerUrl}/counter`);
+      const response1 = await axios.get(`${TARGET_SERVER_URL}/counter`);
+      const response2 = await axios.get(`${TARGET_SERVER_URL}/counter`);
+      const response3 = await axios.get(`${TARGET_SERVER_URL}/counter`);
+      const response4 = await axios.get(`${TARGET_SERVER_URL}/counter`);
 
       expect(response1.data).toEqual({ data: 'get-counter-1' });
       expect(response2.data).toEqual({ data: 'get-counter-2' });
@@ -59,54 +63,67 @@ describe('playbackserver', () => {
     });
 
     it('returns static data for /static', async () => {
-      const response = await axios.post(`${targetServerUrl}/static`, { data: 'post-data' });
+      const response = await axios.post(`${TARGET_SERVER_URL}/static`, { data: 'post-data' });
       expect(response.data).toEqual({ data: 'post-static--post-data' });
     });
 
     it('returns not-found for undefined routes', async () => {
-      await expect(axios.post(`${targetServerUrl}/not-found`)).rejects.toThrow('Request failed with status code 404');
+      await expect(axios.post(`${TARGET_SERVER_URL}/not-found`)).rejects.toThrow('Request failed with status code 404');
     });
   });
 
   describe('recordingServer', () => {
-    describe('proxies requests', () => {
-      it('proxies GET', async () => {
-        const response = await axios.get(`${recordingServerUrl}/static`);
-        expect(response.data).toEqual({ data: 'get-static' });
-      });
+    it('proxies GET request and record them', async () => {
+      const response = await axios.get(`${RECORDING_SERVER_URL}/static`);
+      expect(response.data).toEqual({ data: 'get-static' });
+      expect(fse.existsSync(`${RECORDING_DIR}/GET-static-1.json`)).toEqual(true);
+    });
 
-      it('proxies POST', async () => {
-        const response = await axios.post(`${recordingServerUrl}/static`, { data: 'post-data' });
-        expect(response.data).toEqual({ data: 'post-static--post-data' });
-      });
+    it('proxies POST request and record them', async () => {
+      const response = await axios.post(`${RECORDING_SERVER_URL}/static`, { data: 'post-data' });
+      expect(response.data).toEqual({ data: 'post-static--post-data' });
+      expect(fse.existsSync(`${RECORDING_DIR}/POST-static-1.json`)).toEqual(true);
+    });
 
-      it('proxies errors', async () => {
-        await expect(axios.post(`${recordingServerUrl}/not-found`)).rejects.toThrow('Request failed with status code 404');
-      });
+    it('proxies errors request and record them', async () => {
+      await expect(axios.post(`${RECORDING_SERVER_URL}/not-found`)).rejects.toThrow('Request failed with status code 404');
+      expect(fse.existsSync(`${RECORDING_DIR}/POST-not-found-1.json`)).toEqual(true);
+    });
+
+    it('records multiple calls to the same endpoint as different recordings', async () => {
+      const response1 = await axios.get(`${RECORDING_SERVER_URL}/counter`);
+      const response2 = await axios.get(`${RECORDING_SERVER_URL}/counter`);
+      const response3 = await axios.get(`${RECORDING_SERVER_URL}/counter`);
+      const response4 = await axios.get(`${RECORDING_SERVER_URL}/counter`);
+
+      expect(response1.data).toEqual({ data: 'get-counter-1' });
+      expect(response2.data).toEqual({ data: 'get-counter-2' });
+      expect(response3.data).toEqual({ data: 'get-counter-3' });
+      expect(response4.data).toEqual({ data: 'get-counter-4' });
     });
   });
 
   describe('playbackServer', () => {
     it('replays simple request', async () => {
       // Record
-      await axios.get(`${recordingServerUrl}/static`);
+      await axios.get(`${RECORDING_SERVER_URL}/static`);
 
       // Playback
-      const response = await axios.get(`${playbackServerUrl}/static`);
+      const response = await axios.get(`${PLAYBACK_SERVER_URL}/static`);
       expect(response.data).toEqual({ data: 'get-static' });
     });
 
     it('replays changing requests', async () => {
       // Record
-      await axios.get(`${recordingServerUrl}/counter`);
-      await axios.get(`${recordingServerUrl}/counter`);
-      await axios.get(`${recordingServerUrl}/counter`);
+      await axios.get(`${RECORDING_SERVER_URL}/counter`);
+      await axios.get(`${RECORDING_SERVER_URL}/counter`);
+      await axios.get(`${RECORDING_SERVER_URL}/counter`);
 
       // Playback
-      const response1 = await axios.get(`${playbackServerUrl}/counter`);
-      const response2 = await axios.get(`${playbackServerUrl}/counter`);
-      const response3 = await axios.get(`${playbackServerUrl}/counter`);
-      const response4 = await axios.get(`${playbackServerUrl}/counter`);
+      const response1 = await axios.get(`${PLAYBACK_SERVER_URL}/counter`);
+      const response2 = await axios.get(`${PLAYBACK_SERVER_URL}/counter`);
+      const response3 = await axios.get(`${PLAYBACK_SERVER_URL}/counter`);
+      const response4 = await axios.get(`${PLAYBACK_SERVER_URL}/counter`);
 
       expect(response1.data).toEqual({ data: 'get-counter-1' });
       expect(response2.data).toEqual({ data: 'get-counter-2' });
