@@ -2,6 +2,8 @@ import express from 'express';
 import bodyParser from 'body-parser';
 
 const createTargetServer = async (config) => {
+  const _port = config.port;
+
   const app = express();
   app.use(bodyParser.json());
 
@@ -21,10 +23,11 @@ const createTargetServer = async (config) => {
 
   let server;
   await new Promise((resolve) => {
-    server = app.listen(config.port, resolve);
+    server = app.listen(_port, resolve);
   });
 
   return {
+    port: server.address().port,
     close: () => {
       server.close();
     },
