@@ -16,8 +16,6 @@ describe('recordingServer', () => {
   let recordingServer;
 
   beforeEach(async () => {
-    await fse.remove(RECORDING_DIR);
-
     targetServer = await createTargetServer({
       port: TARGET_SERVER_PORT,
     });

@@ -1,4 +1,3 @@
-import fse from 'fs-extra';
 import axios from 'axios';
 import createTargetServer from './helpers/createTargetServer';
 import { createRecordingServer, createPlaybackServer } from '../lib';
@@ -20,8 +19,6 @@ describe('playbackServer', () => {
   let playbackServer;
 
   beforeEach(async () => {
-    await fse.remove(RECORDING_DIR);
-
     targetServer = await createTargetServer({
       port: TARGET_SERVER_PORT,
     });
