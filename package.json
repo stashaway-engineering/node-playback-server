@@ -1,6 +1,6 @@
 {
   "name": "node-playback-server",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "",
   "main": "dist/index.js",
   "scripts": {
@@ -11,7 +11,9 @@
     "build": "rm -rf dist/ && yarn babel lib --out-dir dist",
     "prepublishOnly": "yarn lint && yarn test && yarn build"
   },
-  "files": ["dist/**/*"],
+  "files": [
+    "dist/**/*"
+  ],
   "bin": "dist/cli/index.js",
   "author": "StashAway",
   "repository": {
