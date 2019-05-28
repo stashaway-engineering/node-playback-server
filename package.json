@@ -4,9 +4,9 @@
   "description": "",
   "main": "dist/index.js",
   "scripts": {
-    "test": "jest",
-    "test:coverage": "jest --coverage --collectCoverageFrom='[\"**/src/**/*.js\", \"!**/examples/**\",\"!**/components/**\",\"!**/constants/**\"]'",
-    "test:watch": "jest --watch",
+    "test": "jest --runInBand",
+    "test:coverage": "yarn test --coverage --collectCoverageFrom='[\"**/src/**/*.js\", \"!**/examples/**\",\"!**/components/**\",\"!**/constants/**\"]'",
+    "test:watch": "yarn test --watch",
     "lint": "eslint --ext .js .",
     "build": "yarn babel lib --out-dir dist"
   },
