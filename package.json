@@ -1,5 +1,5 @@
 {
-  "name": "node-mockserver",
+  "name": "node-playback-server",
   "version": "1.1.0",
   "description": "",
   "main": "dist/index.js",
@@ -8,8 +8,9 @@
     "test:coverage": "jest --coverage --collectCoverageFrom='[\"**/src/**/*.js\", \"!**/examples/**\",\"!**/components/**\",\"!**/constants/**\"]'",
     "test:watch": "jest --watch",
     "lint": "eslint --ext .js .",
-    "build": "yarn babel lib --out-dir dist && node dist/index.js"
+    "build": "yarn babel lib --out-dir dist"
   },
+  "bin": "dist/cli/index.js",
   "author": "StashAway",
   "repository": {
     "type": "git",
@@ -21,8 +22,10 @@
   "license": "MIT",
   "dependencies": {
     "@babel/cli": "^7.4.4",
+    "arg": "^4.1.0",
     "axios": "^0.18.0",
     "body-parser": "^1.19.0",
+    "chalk": "^2.4.2",
     "express": "^4.17.0",
     "fs-extra": "^8.0.1",
     "lodash": "^4.17.11",

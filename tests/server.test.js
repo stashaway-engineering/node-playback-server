@@ -30,11 +30,13 @@ describe('playbackserver', () => {
       target: TARGET_SERVER_URL,
       port: RECORDING_SERVER_PORT,
       directory: RECORDING_DIR,
+      loglevel: 5,
     });
 
     playbackServer = await createPlaybackServer({
       port: PLAYBACK_SERVER_PORT,
       directory: RECORDING_DIR,
+      loglevel: 5,
     });
   });
 

@@ -7,12 +7,19 @@ const createTargetServer = async (config) => {
 
   let getCounter = 0;
 
-  app.get('/static', (req, res) => { res.json({ data: 'get-static' }); });
-  app.get('/counter', (req, res) => { res.json({ data: `get-counter-${getCounter += 1}` }); });
-  app.post('/static', (req, res) => { res.json({ data: `post-static--${req.body.data}` }); });
+  app.get('/static', (req, res) => {
+    res.json({ data: 'get-static' });
+  });
+
+  app.get('/counter', (req, res) => {
+    res.json({ data: `get-counter-${getCounter += 1}` });
+  });
+
+  app.post('/static', (req, res) => {
+    res.json({ data: `post-static--${req.body.data}` });
+  });
 
   let server;
-
   await new Promise((resolve) => {
     server = app.listen(config.port, resolve);
   });
