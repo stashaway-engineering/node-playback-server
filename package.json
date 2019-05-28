@@ -8,16 +8,18 @@
     "test:coverage": "yarn test --coverage --collectCoverageFrom='[\"**/src/**/*.js\", \"!**/examples/**\",\"!**/components/**\",\"!**/constants/**\"]'",
     "test:watch": "yarn test --watch",
     "lint": "eslint --ext .js .",
-    "build": "yarn babel lib --out-dir dist"
+    "build": "rm -rf dist/ && yarn babel lib --out-dir dist",
+    "prepublishOnly": "yarn lint && yarn test && yarn build"
   },
+  "files": ["dist/**/*"],
   "bin": "dist/cli/index.js",
   "author": "StashAway",
   "repository": {
     "type": "git",
-    "url": "https://github.com/stashaway-engineering/node-my-info-sg.git"
+    "url": "https://github.com/stashaway-engineering/node-playback-server.git"
   },
   "bugs": {
-    "url": "https://github.com/stashaway-engineering/node-my-info-sg/issues"
+    "url": "https://github.com/stashaway-engineering/node-playback-server/issues"
   },
   "license": "MIT",
   "dependencies": {
