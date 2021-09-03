@@ -2,6 +2,10 @@
 
 [![npm version](https://badge.fury.io/js/node-playback-server.svg)](https://badge.fury.io/js/node-playback-server) [![CircleCI](https://circleci.com/gh/stashaway-engineering/node-playback-server.svg?style=svg)](https://circleci.com/gh/stashaway-engineering/node-playback-server)
 
+Node-playback-server allows you to run your e2e tests against a mock server. See the diagram below for a quick overview.
+
+![Screen Shot 2021-09-03 at 10 17 20 AM](https://user-images.githubusercontent.com/4867178/131940571-38ba4f21-0f6d-4346-b124-58bbd00250e0.png)
+
 
 ## Usage (CLI)
 
@@ -76,6 +80,12 @@ describe('login', () => {
 });
 ```
 
-## TODO
+## Difference from prior works
 
-Write better readme
+1. Integrates nicely with node ecosystem so you can spawn a playback-server on your test runner.
+2. Handles cases when the recording responses changes.
+    - e.g. `GET /user/profile` responses might changes depending whether user has finished onboarding, this library records them as 2 separate JSON files.
+
+## Improvements
+
+1. Allows forwarding of multipart-form data (Currently, it only works for JSON responses)
