@@ -1,5 +1,6 @@
 import fse from 'fs-extra';
 import axios from 'axios';
+import FormData from 'form-data';
 import createTargetServer from './helpers/createTargetServer';
 import { createRecordingServer } from '../lib';
 
@@ -43,6 +44,22 @@ describe('recordingServer', () => {
     const response = await axios.post(`${RECORDING_SERVER_URL}/static`, { data: 'post-data' });
     expect(response.data).toEqual({ data: 'post-static--post-data' });
     expect(fse.existsSync(`${RECORDING_DIR}/POST-static-1.json`)).toEqual(true);
+  });
+
+  it('proxies multipart/form-data request and record them', async () => {
+    const data = new FormData();
+    data.append('name', 'Fred');
+
+    const response = await axios({
+      url: `${RECORDING_SERVER_URL}/multipart`,
+      method: 'post',
+      data: data.getBuffer(),
+      headers: {
+        ...data.getHeaders(),
+      },
+    });
+    expect(response.data).toEqual({ data: 'post-static--multipart' });
+    expect(fse.existsSync(`${RECORDING_DIR}/POST-multipart-1.json`)).toEqual(true);
   });
 
   it('proxies errors request and record them', async () => {

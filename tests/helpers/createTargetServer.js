@@ -21,6 +21,10 @@ const createTargetServer = async (config) => {
     res.json({ data: `post-static--${req.body.data}` });
   });
 
+  app.post('/multipart', (req, res) => {
+    res.json({ data: 'post-static--multipart' });
+  });
+
   let server;
   await new Promise((resolve) => {
     server = app.listen(_port, resolve);
