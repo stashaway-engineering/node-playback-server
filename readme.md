@@ -6,18 +6,17 @@ Node-playback-server allows you to run your e2e tests against a mock server. See
 
 ![Screen Shot 2021-09-03 at 10 17 20 AM](https://user-images.githubusercontent.com/4867178/131940571-38ba4f21-0f6d-4346-b124-58bbd00250e0.png)
 
-
 ## Usage (CLI)
 
-```js
+```bash
 Commands
-	
+
   $ node-playback-server record  Start a recording server
   $ node-playback-server play    Start a playback server
   $ node-playback-server clean   Clears temp directory
-	
+
 OPTIONS
-	
+
   --port (p)           Server port (optional)
   --archive (x)        Recording archive (use either archive or directory)
   --directory (d)      Recording directory (use either archive or directory)
@@ -25,12 +24,11 @@ OPTIONS
   --loglevel (l)       Server log level (1 to 5)
 ```
 
-
 ## Usage (Node)
 
 ### Record
-	
-```
+
+```js
 import { createRecordingServer } from 'node-playback-server';
 
 describe('login', () => {
@@ -49,15 +47,15 @@ describe('login', () => {
 
   it('serves response from archive', async () => {
     const baseURL = `http://localhost:${recordingServer.port}`;
-    // Now any request to baseURL will be proxied to target ('https://api.stashaway.sg') 
+    // Now any request to baseURL will be proxied to target ('https://api.stashaway.sg')
     // and recorded to archive './recording/login.tgz'
   });
 });
 ```
 
 ### Playback
-	
-```
+
+```js
 import { createPlaybackServer } from 'node-playback-server';
 
 describe('login', () => {
@@ -75,7 +73,7 @@ describe('login', () => {
 
   it('proxies GET request and record them', async () => {
     const baseURL = `http://localhost:${recordingServer.port}`;
-    // Now any request to baseURL will be served from stored response 
+    // Now any request to baseURL will be served from stored response
   });
 });
 ```
@@ -84,8 +82,5 @@ describe('login', () => {
 
 1. Integrates nicely with node ecosystem so you can spawn a playback-server on your test runner.
 2. Handles cases when the recording responses changes.
-    - e.g. `GET /user/profile` responses might changes depending whether user has finished onboarding, this library records them as 2 separate JSON files.
-
-## Improvements
-
-1. Allows forwarding of multipart-form data (Currently, it only works for JSON responses)
+   - e.g. `GET /user/profile` responses might changes depending whether user has finished onboarding, this library records them as 2 separate JSON files.
+3. Supports requests with multipart/form-data content type.
