@@ -37,13 +37,13 @@ describe('recordingServer', () => {
   it('proxies GET request and record them', async () => {
     const response = await axios.get(`${RECORDING_SERVER_URL}/static`);
     expect(response.data).toEqual({ data: 'get-static' });
-    expect(fse.existsSync(`${RECORDING_DIR}/GET-static-1.json`)).toEqual(true);
+    expect(fse.existsSync(`${RECORDING_DIR}/b7d15bb25a0657562f3984f7519cc594-1.json`)).toEqual(true);
   });
 
   it('proxies POST request and record them', async () => {
     const response = await axios.post(`${RECORDING_SERVER_URL}/static`, { data: 'post-data' });
     expect(response.data).toEqual({ data: 'post-static--post-data' });
-    expect(fse.existsSync(`${RECORDING_DIR}/POST-static-1.json`)).toEqual(true);
+    expect(fse.existsSync(`${RECORDING_DIR}/52a1a7a471169f14486d060fdd85653b-1.json`)).toEqual(true);
   });
 
   it('proxies multipart/form-data request and record them', async () => {
@@ -59,12 +59,12 @@ describe('recordingServer', () => {
       },
     });
     expect(response.data).toEqual({ data: 'post-static--multipart' });
-    expect(fse.existsSync(`${RECORDING_DIR}/POST-multipart-1.json`)).toEqual(true);
+    expect(fse.existsSync(`${RECORDING_DIR}/7dc4335c8eff6fe9b981290e2fd42b4a-1.json`)).toEqual(true);
   });
 
   it('proxies errors request and record them', async () => {
     await expect(axios.post(`${RECORDING_SERVER_URL}/not-found`)).rejects.toThrow('Request failed with status code 404');
-    expect(fse.existsSync(`${RECORDING_DIR}/POST-not-found-1.json`)).toEqual(true);
+    expect(fse.existsSync(`${RECORDING_DIR}/f96d2745c4cd5944206645d97ed5c5c9-1.json`)).toEqual(true);
   });
 
   it('records multiple calls to the same endpoint as different recordings', async () => {
@@ -77,5 +77,14 @@ describe('recordingServer', () => {
     expect(response2.data).toEqual({ data: 'get-counter-2' });
     expect(response3.data).toEqual({ data: 'get-counter-3' });
     expect(response4.data).toEqual({ data: 'get-counter-4' });
+  });
+
+  it('handles longer url and hash the resulting file accordingly', async () => {
+    const response = await axios.get(
+      // eslint-disable-next-line max-len
+      `${RECORDING_SERVER_URL}/api/v1/goals/templates?goalTypes=ESG%2CGENERAL_INVESTING%2CINCOME%2CMMF%2CRETIREMENT%2CBUY_A_HOME%2CCHILD_EDUCATION%2CVEHICLE%2CEMERGENCY_FUND%2CSTART_BUSINESS%2CWEDDING%2CTRAVEL`,
+    );
+    expect(response.data).toEqual({ data: 'get-longer-url' });
+    expect(fse.existsSync(`${RECORDING_DIR}/9d46377c618dcaf937cfb068bb53d8ea-1.json`)).toEqual(true);
   });
 });
