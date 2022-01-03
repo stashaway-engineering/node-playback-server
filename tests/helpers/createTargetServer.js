@@ -25,6 +25,14 @@ const createTargetServer = async (config) => {
     res.json({ data: 'post-static--multipart' });
   });
 
+  app.get(
+    // eslint-disable-next-line max-len
+    '/api/v1/goals/templates',
+    (req, res) => {
+      res.json({ data: 'get-longer-url' });
+    },
+  );
+
   let server;
   await new Promise((resolve) => {
     server = app.listen(_port, resolve);
