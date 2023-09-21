@@ -34,8 +34,16 @@ describe('recordingServer', () => {
     await recordingServer.close();
   });
 
-  it('proxies GET request and record them', async () => {
+  it('proxies GET request without any body and record them', async () => {
+    const requestSpy = jest.spyOn(axios, 'request');
     const response = await axios.get(`${RECORDING_SERVER_URL}/static`);
+    expect(requestSpy).toHaveBeenCalledWith({
+      baseURL: TARGET_SERVER_URL,
+      data: undefined,
+      url: '/static',
+      method: 'GET',
+      headers: expect.any(Object),
+    });
     expect(response.data).toEqual({ data: 'get-static' });
     expect(fse.existsSync(`${RECORDING_DIR}/b7d15bb25a0657562f3984f7519cc594-1.json`)).toEqual(true);
   });
