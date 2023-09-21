@@ -46,9 +46,27 @@ describe('recordingServer', () => {
     expect(fse.existsSync(`${RECORDING_DIR}/52a1a7a471169f14486d060fdd85653b-1.json`)).toEqual(true);
   });
 
-  it('proxies multipart/form-data request and record them', async () => {
+  it('proxies multipart/form-data request with a single file per field and record them', async () => {
     const data = new FormData();
     data.append('name', 'Fred');
+    data.append('file', Buffer.from('hello world'), 'hello.txt');
+
+    const response = await axios({
+      url: `${RECORDING_SERVER_URL}/multipart`,
+      method: 'post',
+      data: data.getBuffer(),
+      headers: {
+        ...data.getHeaders(),
+      },
+    });
+    expect(response.data).toEqual({ data: 'post-static--multipart' });
+    expect(fse.existsSync(`${RECORDING_DIR}/7dc4335c8eff6fe9b981290e2fd42b4a-1.json`)).toEqual(true);
+  });
+
+  it('proxies multipart/form-data request with multiple files per field and record them', async () => {
+    const data = new FormData();
+    data.append('files', Buffer.from('hello world 1'), 'hello_1.txt');
+    data.append('files', Buffer.from('hello world 2'), 'hello_2.txt');
 
     const response = await axios({
       url: `${RECORDING_SERVER_URL}/multipart`,
